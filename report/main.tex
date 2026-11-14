@@ -1,0 +1,48 @@
+% CVPR Paper Template; see https://github.com/cvpr-org/author-kit
+
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+%%%%%%%%% PAPER TYPE
+\usepackage[pagenumbers]{cvpr} % Clean version with page numbers (no review line numbers)
+
+% Import additional packages in the preamble file, before hyperref
+\input{preamble}
+
+\definecolor{cvprblue}{rgb}{0.21,0.49,0.74}
+\usepackage[pagebackref,breaklinks,colorlinks,allcolors=cvprblue]{hyperref}
+
+\def\confName{02516}
+\def\confYear{2025}
+
+%%%%%%%%% TITLE - PLEASE UPDATE
+\title{Image Segmentation on PH2 and DRIVE: Architectures, Metrics, and Loss Ablations}
+
+%%%%%%%%% AUTHORS - PLEASE UPDATE
+\author{Author Name (s246525)\\
+Technical University of Denmark (DTU)\\
+{\tt\small s246525@dtu.dk}
+}
+
+\begin{document}
+\maketitle
+
+% ============================================================================
+% MAIN REPORT BODY (Strictly <= 3 pages including all tables and figures)
+% ============================================================================
+\input{sec/0_abstract}
+\input{sec/1_datasets}
+\input{sec/2_methods}
+\input{sec/3_results}
+
+% ============================================================================
+% REFERENCES & GENERATIVE AI STATEMENT (Excluded from the 3-page limit)
+% ============================================================================
+\clearpage
+{
+    \small
+    \bibliographystyle{ieeenat_fullname}
+    \bibliography{main}
+}
+\input{sec/4_genai_statement}
+
+\end{document}

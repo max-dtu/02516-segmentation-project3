@@ -1,0 +1,99 @@
+%% This file contains a number of tweaks that are typically applied to the main document.
+%% They are not enabled by default, but can be enabled by uncommenting the relevant lines.
+
+
+%%
+%% Official support for 2-column teaser figure
+%%
+\usepackage{cuted} %< for strip environment
+
+%%
+%% For auto-referencing of figures (see fig/teaser.tex and \label{} therein) 
+%%
+\usepackage{currfile} %< for \currfilebase macro
+
+%%
+%% caption and (global) spacing overrides
+%%
+\usepackage{caption} %< for "\captionof" commands (teaser)
+% \setlength{\abovecaptionskip}{.5em} % space above caption
+% \setlength{\belowcaptionskip}{1em} % space below caption
+
+%%
+%% Inline annotations; for predefined colors, refer to "dvipsnames" in the xcolor package:
+%% https://tinyurl.com/overleaf-colors
+%%
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\TODO}[1]{\textbf{\color{red}[TODO: #1]}}
+%%
+%% Disable for camera ready / submission by uncommenting these lines:
+%%
+% \renewcommand{\TODO}[1]{}
+% \renewcommand{\todo}[1]{#1}
+
+%%
+%% Work harder in optimizing text layout. Typically shrinks text by 1/6 of page, enable
+%% it at the very end of the writing process, when you are just above the page limit.
+%%
+\usepackage{microtype}
+\usepackage{listings}
+\definecolor{codebg}{rgb}{0.97,0.97,0.98}
+\definecolor{codeborder}{rgb}{0.85,0.87,0.90}
+\definecolor{codekw}{rgb}{0.00,0.35,0.70}
+\definecolor{codestr}{rgb}{0.64,0.08,0.08}
+\definecolor{codecomm}{rgb}{0.38,0.44,0.48}
+\lstset{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{codekw}\bfseries,
+  stringstyle=\color{codestr},
+  commentstyle=\color{codecomm}\itshape,
+  morekeywords={self,torch,F,True,False,None},
+  frame=single,
+  rulecolor=\color{codeborder},
+  framerule=0.5pt,
+  framesep=3pt,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  aboveskip=5pt,
+  belowskip=5pt,
+  xleftmargin=3pt,
+  xrightmargin=3pt
+}
+
+%%
+%% Fine-tune paragraph spacing.
+%%
+% \renewcommand{\paragraph}[1]{\vspace{.5em}\noindent\textbf{#1.}}
+
+%%
+%% Globally adjusts space between figure and caption.
+%%
+% \setlength{\abovecaptionskip}{.5em}
+
+%%
+%% Allows "the use of \paper to refer to the project name"
+%% with automatic management of space at the end of the word.
+%%
+% \usepackage{xspace}
+% \newcommand{\paper}{ProjectName\xspace}
+
+%%
+%% Commonly used math definitions.
+%%
+% \DeclareMathOperator*{\argmin}{arg\,min}
+% \DeclareMathOperator*{\argmax}{arg\,max}
+
+%%
+%% Tighten underline.
+%%
+% \usepackage{soul}
+% \setuldepth{foobar}
+
+%%
+%% Reconfigure paragraph (tweaks spacing)
+%%

@@ -1,0 +1,56 @@
+\section{Methods and Evaluation Metrics}
+\label{sec:methods}
+
+\subsection{Evaluation Metrics}
+We evaluate all models using five pixel-wise metrics computed from true positives (TP), false positives (FP), true negatives (TN), and false negatives (FN):
+\begin{itemize}
+    \item \textbf{Dice:} $\frac{2\text{TP}}{2\text{TP}+\text{FP}+\text{FN}}$ \quad \textbf{IoU:} $\frac{\text{TP}}{\text{TP}+\text{FP}+\text{FN}}$
+    \item \textbf{Accuracy:} $\frac{\text{TP}+\text{TN}}{\text{TP}+\text{TN}+\text{FP}+\text{FN}}$ \quad \textbf{Sensitivity:} $\frac{\text{TP}}{\text{TP}+\text{FN}}$ \quad \textbf{Specificity:} $\frac{\text{TN}}{\text{TN}+\text{FP}}$
+\end{itemize}
+\textbf{Strengths and Weaknesses:} Accuracy and Specificity include TN and are therefore dominated by background pixels under class imbalance. On DRIVE, where vessels occupy $<10\%$ of pixels, predicting all background already yields $\text{Accuracy} = 0.9164$ and $\text{Specificity} = 1.0000$ while $\text{Dice} = 0$. Sensitivity measures foreground recall (crucial for thin retinal vessels) but ignores FP; conversely, Dice and IoU ignore TN and directly measure foreground overlap, with IoU penalizing errors more strongly ($\text{IoU} \le \text{Dice}$). On PH2, lesions are larger ($\sim 35\%$ foreground), making Accuracy more informative, though Dice/IoU remain preferable for boundary quality.
+
+\subsection{Network Architectures}
+\textbf{EncDec Baseline:} A 4-stage encoder-decoder CNN with 64-channel $3\times3$ convolutions, $2\times2$ max-pooling, a $64$-channel bottleneck, and nearest-neighbor $2\times$ upsampling (no skip connections).
+
+\textbf{U-Net:} A 4-level U-Net (\texttt{base\_channels=32}) using double $3\times3$ Conv-BN-ReLU blocks, $2\times2$ max-pooling, transposed-convolution $2\times$ upsampling, and channel-wise skip connections (\texttt{torch.cat}). Using $256\times256$ (PH2) and $512\times512$ (DRIVE) preserves fine vessel detail while keeping all feature maps divisible by $16$:
+\begin{center}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Layer & PH2 ($256\times256$) & DRIVE ($512\times512$) \\
+\midrule
+\texttt{enc1 / dec1} & $32\times256\times256$ & $32\times512\times512$ \\
+\texttt{enc2 / dec2} & $64\times128\times128$ & $64\times256\times256$ \\
+\texttt{enc3 / dec3} & $128\times64\times64$  & $128\times128\times128$ \\
+\texttt{enc4 / dec4} & $256\times32\times32$  & $256\times64\times64$ \\
+\texttt{bottleneck}  & $512\times16\times16$  & $512\times32\times32$ \\
+\texttt{output}      & $1\times256\times256$  & $1\times512\times512$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{lstlisting}[caption={U-Net decoder skip concatenation (\texttt{UNetModel.py}).}]
+u4 = self.up4(b)
+d4 = self.dec4(torch.cat([u4, e4], dim=1)) # + up3..up1
+out = self.head(d1)
+\end{lstlisting}
+
+\subsection{Loss Functions and Weak Supervision}
+To address class imbalance, we compare three pixel-wise losses on raw logits $\hat{y}$: (1) standard \textbf{Binary Cross-Entropy (BCE)}; (2) \textbf{Focal Loss}~\cite{lin2017focal} ($\gamma=2.0$), which scales BCE by $(1-p_t)^\gamma$ to focus gradients on hard pixels; and (3) \textbf{Positive-Weighted BCE}, scaling positive errors by $w_{\text{pos}}$ ($2.0$ on PH2, $8.0$ on DRIVE).
+
+For Part~2 (weak supervision on PH2), we replace full training masks with simulated positive/negative point clicks while keeping the \texttt{U-Net}, splits ($140/30/30$), and hyperparameters ($256\times256$, $50$ epochs, Adam $\text{lr}=10^{-3}$) identical. We train with a \textbf{Partial Point BCE} loss evaluated only over the binary click mask $M \in \{0,1\}^{H\times W}$:
+$\mathcal{L}_{\text{pt}} = \frac{\sum_{i} M_i \,\ell_{\text{BCE}}(\hat{y}_i, y_i)}{\max(\sum_{i} M_i, 1)}$.
+We compare \textbf{Uniform} sampling (random foreground/background pixels) against \textbf{Interior} sampling ($11\times11$ mask erosion for positive clicks and $15\times15$ dilation exclusion for negative clicks) to mimic human annotators clicking away from ambiguous borders.
+\begin{lstlisting}[caption={Focal, Partial Point BCE (\texttt{losses.py}), and Interior click sampling (\texttt{PH2WeakDataset.py}).}]
+# FocalLoss.forward
+bce = F.binary_cross_entropy_with_logits(y_pred, y_true, reduction="none")
+pt = torch.sigmoid(y_pred) * y_true + (1 - torch.sigmoid(y_pred)) * (1 - y_true)
+loss = ((1.0 - pt).pow(self.gamma) * bce).mean()
+
+# PointBCELoss.forward
+bce = F.binary_cross_entropy_with_logits(y_pred, click_target, reduction="none")
+loss = (bce * click_mask).sum() / click_mask.sum().clamp(min=1.0)
+
+# Interior click regions (PH2WeakDataset)
+pos_region = _erode_mask(m, kernel_size=11)
+neg_region = ~_dilate_mask(m, kernel_size=15)
+\end{lstlisting}

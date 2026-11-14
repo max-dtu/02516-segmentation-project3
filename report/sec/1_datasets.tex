@@ -1,0 +1,9 @@
+\section{Datasets and Splits}
+\label{sec:datasets}
+
+We evaluate our segmentation models on two medical imaging datasets located at \texttt{/dtu/datasets1/02516}:
+
+\begin{itemize}
+    \item \textbf{PH2 (Skin Lesion Segmentation):} Contains 200 RGB dermoscopic images (\texttt{.bmp}) with resolutions around $767 \times 576$ pixels (ranging from $761\text{--}769 \times 572\text{--}577$) and corresponding binary lesion masks (\texttt{*\_lesion.bmp}). Because PH2 has no pre-assigned splits, we shuffle the 200 cases with a fixed seed (\texttt{seed=42}) and split them 70\% / 15\% / 15\% into \textbf{140 training}, \textbf{30 validation}, and \textbf{30 test} images. Images are resized to $256 \times 256$ using bilinear interpolation, and masks using nearest-neighbor interpolation to preserve binary labels.
+    \item \textbf{DRIVE (Retinal Blood Vessel Segmentation):} Contains 40 RGB fundus images (\texttt{.tif}, $565 \times 584$ pixels) pre-split into \texttt{training/} (20 images) and \texttt{test/} (20 images). Crucially, DRIVE provides two mask types: manual retinal vessel segmentations in \texttt{training/1st\_manual/} (\texttt{*\_manual1.gif}) and field-of-view (FOV) masks in \texttt{training/mask/} and \texttt{test/mask/} (\texttt{*\_mask.gif}). Because \texttt{test/} lacks vessel ground-truth masks, we use only the 20 labeled images from \texttt{training/} (with \texttt{1st\_manual/} vessel masks) and split them 70\% / 15\% / 15\% (\texttt{seed=42}) into \textbf{14 training}, \textbf{3 validation}, and \textbf{3 test} images, resized to $512 \times 512$ (bilinear for images, nearest-neighbor for masks).
+\end{itemize}

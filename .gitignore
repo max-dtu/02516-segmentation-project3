@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*.pt
+*.pth
+outputs/
+logs/
+report.zip
+.DS_Store
