@@ -1,9 +1,8 @@
 \section*{Statement on the Use of Generative AI}
 We used Google Antigravity (AI coding assistant) as an engineering and writing aid across Parts~1 and~2. Specifically, it was used to:
 \begin{itemize}
-    \item Inspect dataset directory structures and design reproducible train/validation/test splits and PyTorch \texttt{Dataset} classes for PH2, DRIVE, and simulated point-click weak supervision (\texttt{PH2WeakDataset}).
-    \item Debug starter code issues (missing imports, hardcoded \texttt{nn.Upsample} dimensions in \texttt{EncDec}, and \texttt{BCELoss} variable typos) and implement \texttt{U-Net}, segmentation metrics, and losses (\texttt{FocalLoss}, \texttt{WeightedBCELoss}, \texttt{PointBCELoss}).
+    \item Simulate point-click weak supervision (\texttt{PH2WeakDataset}).
+    \item Debug starter code issues (missing imports, hardcoded \texttt{nn.Upsample} dimensions in \texttt{EncDec}, and \texttt{BCELoss} variable typos).
     \item Troubleshoot DTU HPC environment setup (virtual environment creation and PyTorch CUDA compatibility for Tesla V100).
     \item Structure and format the 3-page CVPR \LaTeX\ report.
 \end{itemize}
-All code, model architectures, training runs, and reported metrics were executed and verified directly by the author on DTU HPC.
